@@ -4,6 +4,7 @@ import torch
 
 from exp.exp_informer import Exp_Informer
 
+# 代码创建了一个 ArgumentParser 对象，该对象将包含解析命令行参数所需的所有信息。
 parser = argparse.ArgumentParser(description='[Informer] Long Sequences Forecasting')
 
 parser.add_argument('--model', type=str, required=True, default='informer',help='model of experiment, options: [informer, informerstack, informerlight(TBD)]')
