@@ -7,6 +7,7 @@ from exp.exp_informer import Exp_Informer
 # 代码创建了一个 ArgumentParser 对象，该对象将包含解析命令行参数所需的所有信息。
 parser = argparse.ArgumentParser(description='[Informer] Long Sequences Forecasting')
 
+# add_argument 方法用于向命令行接口添加一个参数。
 parser.add_argument('--model', type=str, required=True, default='informer',help='model of experiment, options: [informer, informerstack, informerlight(TBD)]')
 
 parser.add_argument('--data', type=str, required=True, default='ETTh1', help='data')
@@ -59,6 +60,7 @@ parser.add_argument('--gpu', type=int, default=0, help='gpu')
 parser.add_argument('--use_multi_gpu', action='store_true', help='use multiple gpus', default=False)
 parser.add_argument('--devices', type=str, default='0,1,2,3',help='device ids of multile gpus')
 
+# 解析命令行参数，并将结果存储在一个命名空间中，该命名空间可以通过点符号来访问参数值。
 args = parser.parse_args()
 
 args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
