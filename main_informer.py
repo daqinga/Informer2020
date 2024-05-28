@@ -4,7 +4,7 @@ import torch
 
 from exp.exp_informer import Exp_Informer
 
-# 代码创建了一个 ArgumentParser 对象，该对象将包含解析命令行参数所需的所有信息。
+# 创建一个 ArgumentParser 对象，该对象将包含解析命令行参数所需的所有信息。
 parser = argparse.ArgumentParser(description='[Informer] Long Sequences Forecasting')
 
 # add_argument 方法用于向命令行接口添加一个参数。
@@ -71,7 +71,7 @@ if args.use_gpu and args.use_multi_gpu:
     args.device_ids = [int(id_) for id_ in device_ids]
     args.gpu = args.device_ids[0]
 
-# 定义了一个名为 data_parser 的字典，该字典用于存储不同数据集的配置信息
+# 定义一个名为 data_parser 的字典，该字典用于存储不同数据集的配置信息
 data_parser = {
     'ETTh1':{'data':'ETTh1.csv','T':'OT','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
     'ETTh2':{'data':'ETTh2.csv','T':'OT','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
