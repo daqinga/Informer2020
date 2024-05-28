@@ -71,6 +71,7 @@ if args.use_gpu and args.use_multi_gpu:
     args.device_ids = [int(id_) for id_ in device_ids]
     args.gpu = args.device_ids[0]
 
+# 定义了一个名为 data_parser 的字典，该字典用于存储不同数据集的配置信息
 data_parser = {
     'ETTh1':{'data':'ETTh1.csv','T':'OT','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
     'ETTh2':{'data':'ETTh2.csv','T':'OT','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
