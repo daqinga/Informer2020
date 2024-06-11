@@ -59,7 +59,9 @@ class Exp_Informer(Exp_Basic):
 
     def _get_data(self, flag):
         args = self.args
+        # flag：一个字符串，用于指定获取数据集的标志（例如，'test'、'pred' 或其他）。
 
+        # 将数据集名称映射到对应的数据集类
         data_dict = {
             'ETTh1':Dataset_ETT_hour,
             'ETTh2':Dataset_ETT_hour,
