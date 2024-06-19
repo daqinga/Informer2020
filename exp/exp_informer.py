@@ -115,6 +115,8 @@ class Exp_Informer(Exp_Basic):
     def vali(self, vali_data, vali_loader, criterion):
         self.model.eval()
         total_loss = []
+        # 使用enumerate遍历验证数据加载器vali_loader中的每一个批次。
+        # 每个批次包含batch_x(输入特征)、batch_y(目标标签)、batch_x_mark(输入的时间标记)、batch_y_mark(输出的时间标记)。
         for i, (batch_x,batch_y,batch_x_mark,batch_y_mark) in enumerate(vali_loader):
             pred, true = self._process_one_batch(
                 vali_data, batch_x, batch_y, batch_x_mark, batch_y_mark)
