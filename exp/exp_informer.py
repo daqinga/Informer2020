@@ -271,10 +271,12 @@ class Exp_Informer(Exp_Basic):
 
         batch_x_mark = batch_x_mark.float().to(self.device)
         batch_y_mark = batch_y_mark.float().to(self.device)
+        # 移动到指定的计算设备（如GPU）上（.to(self.device)）。这确保了数据与模型在同一设备上，可以加速计算过程。
 
         # decoder input
         if self.args.padding==0:
             dec_inp = torch.zeros([batch_y.shape[0], self.args.pred_len, batch_y.shape[-1]]).float()
+        #     尺寸为 [batch_size, self.args.pred_len, feature_dim]。这代表了解码器的初始输入序列
         elif self.args.padding==1:
             dec_inp = torch.ones([batch_y.shape[0], self.args.pred_len, batch_y.shape[-1]]).float()
         dec_inp = torch.cat([batch_y[:,:self.args.label_len,:], dec_inp], dim=1).float().to(self.device)
