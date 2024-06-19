@@ -121,8 +121,10 @@ class Exp_Informer(Exp_Basic):
             pred, true = self._process_one_batch(
                 vali_data, batch_x, batch_y, batch_x_mark, batch_y_mark)
             loss = criterion(pred.detach().cpu(), true.detach().cpu())
+            # .detach().cpu()操作是为了从计算图中分离出张量（停止梯度跟踪以节省内存），并将数据从GPU移到CPU（如果模型在GPU上运行的话）。
             total_loss.append(loss)
         total_loss = np.average(total_loss)
+        # 使用Numpy库计算所有批次损失的平均值，以此作为整个验证集的总损失。
         self.model.train()
         return total_loss
 
@@ -145,6 +147,9 @@ class Exp_Informer(Exp_Basic):
 
         if self.args.use_amp:
             scaler = torch.cuda.amp.GradScaler()
+        # 自动混合精度（Automatic Mixed Precision, AMP）是一种训练神经网络的技术，旨在通过智能地在训练过程中使用不同的数值精度来加速计算并减少内存使用。
+        # 自动混合精度的核心思想是结合使用32位浮点数和16位浮点数（float16）进行计算。具体来说，它会在不损失模型准确性的前提下，对模型中的一部分运算（如前向传播和反向传播中的大部分计算）使用低精度的float16，而对于需要更高精度以保持数值稳定性的操作（如梯度更新和某些关键层的计算）则继续使用float32。
+        # 这种方法能够显著减少训练所需的内存带宽和存储需求，同时利用现代GPU（特别是具有Tensor Cores的GPU）对半精度计算的硬件加速能力，从而加速训练过程。
 
         for epoch in range(self.args.train_epochs):
             iter_count = 0
