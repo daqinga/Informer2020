@@ -140,6 +140,7 @@ class Exp_Informer(Exp_Basic):
         time_now = time.time()
         
         train_steps = len(train_loader)
+        # train_steps表示完成一次训练循环（一个或多个epoch）所需的步数
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
         
         model_optim = self._select_optimizer()
@@ -152,6 +153,8 @@ class Exp_Informer(Exp_Basic):
         # 这种方法能够显著减少训练所需的内存带宽和存储需求，同时利用现代GPU（特别是具有Tensor Cores的GPU）对半精度计算的硬件加速能力，从而加速训练过程。
 
         for epoch in range(self.args.train_epochs):
+            # 使用train_loader迭代遍历训练数据集，其中epoch表示当前训练轮数，
+            # iter_count用于记录当前轮次已经处理的batch数量，train_loss用于记录当前轮次的训练损失
             iter_count = 0
             train_loss = []
             
@@ -165,7 +168,8 @@ class Exp_Informer(Exp_Basic):
                     train_data, batch_x, batch_y, batch_x_mark, batch_y_mark)
                 loss = criterion(pred, true)
                 train_loss.append(loss.item())
-                
+
+                # 每处理100个批次，打印当前迭代信息、平均处理速度及剩余预计时间，同时重置计数器和时间标记。
                 if (i+1) % 100==0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
                     speed = (time.time()-time_now)/iter_count
@@ -197,7 +201,13 @@ class Exp_Informer(Exp_Basic):
             adjust_learning_rate(model_optim, epoch+1, self.args)
             
         best_model_path = path+'/'+'checkpoint.pth'
+        # 加载模型状态字典:
+        # torch.load(best_model_path)是PyTorch中的一个关键函数，它的作用是从指定的文件路径（在这里是best_model_path）加载一个之前使用torch.save()保存的对象。
+        # 在这个上下文中，它加载的是一个模型的状态字典（state dictionary），这个字典包含了模型所有参数（如权重和偏置）的值。这是模型训练后的快照，用于恢复模型到某个特定状态。
         self.model.load_state_dict(torch.load(best_model_path))
+        # 加载状态字典到模型:
+        # self.model.load_state_dict(state_dict)是PyTorch模型类的一个方法，用于从给定的状态字典中恢复模型的内部状态。
+        # 这里的self.model指的是当前类实例中的模型对象，而state_dict是前面步骤中加载得到的模型状态字典。调用这个方法后，模型的权重、偏置等参数会被更新为加载状态字典中对应的值，从而实现模型的恢复。
         
         return self.model
 
@@ -280,9 +290,14 @@ class Exp_Informer(Exp_Basic):
         elif self.args.padding==1:
             dec_inp = torch.ones([batch_y.shape[0], self.args.pred_len, batch_y.shape[-1]]).float()
         dec_inp = torch.cat([batch_y[:,:self.args.label_len,:], dec_inp], dim=1).float().to(self.device)
+        # 将实际的目标序列的前 self.args.label_len 部分与初始化的解码器输入拼接起来，形成完整的解码器输入序列。
         # encoder - decoder
+        # 这是一个布尔标志，用于指示是否启用自动混合精度（Automatic Mixed Precision, AMP）训练。
+        # AMP是一种技术，通过在支持的运算中自动使用较低精度（如float16）数据类型来加速训练过程并减少显存消耗，同时在关键路径上保持float32以保证数值稳定性
         if self.args.use_amp:
             with torch.cuda.amp.autocast():
+                # 如果self.args.use_amp为True，函数利用torch.cuda.amp.autocast()上下文管理器包裹模型的调用。
+                # 这会自动将模型内部的部分计算转换为半精度（例如float16），除非特定操作需要更高的精度以维持数值稳定性。
                 if self.args.output_attention:
                     outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
                 else:
@@ -296,5 +311,6 @@ class Exp_Informer(Exp_Basic):
             outputs = dataset_object.inverse_transform(outputs)
         f_dim = -1 if self.args.features=='MS' else 0
         batch_y = batch_y[:,-self.args.pred_len:,f_dim:].to(self.device)
+        # 如果f_dim为-1，则选取最后一列；如果为0，则从第一列开始选取所有列
 
         return outputs, batch_y
